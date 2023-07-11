@@ -17,8 +17,7 @@ public class JdbcPostRepository {
     private final JdbcTemplate jdbcTemplate;
     public Set<Post> findAllPosts() {
         return jdbcTemplate.queryForStream("select id, title, description, body, slug, post_status, created_on, updated_on from posts",
-                        new PostMapper())
-                .collect(Collectors.toSet());
+                        new PostMapper()).collect(Collectors.toSet());
     }
     public void addPost(Post post) {
         final String sql = "insert into posts(title, description, body," +
