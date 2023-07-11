@@ -1,32 +1,34 @@
 package com.apress.demo.springblog.service;
 
 import com.apress.demo.springblog.domain.Post;
-import com.apress.demo.springblog.repository.JdbcPostRepository;
+import com.apress.demo.springblog.repository.PostJdbcDataRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
-    private final JdbcPostRepository postRepository;
+    private final PostJdbcDataRepository postRepository;
 
     public void addPost(Post post){
         post.setCreatedOn(LocalDate.now());
         post.setUpdatedOn(LocalDate.now());
-        postRepository.addPost(post);
+        postRepository.save(post);
     }
 
-    public Set<Post> findAllPosts(){
-        return postRepository.findAllPosts();
+    public Set<PostDto> findAllPosts() {
+        return StreamSupport.stream(postRepository.findAll().spliterator(), false)
+                .map(PostDto::toPostDto).collect(Collectors.toSet());
     }
 
 
     public boolean postExistsWithTitle(String title) {
-        return postRepository.findAllPosts().stream()
-                .anyMatch(post -> post.getTitle().equals(title));
+        return postRepository.findByTitle(title).isPresent();
     }
 }
